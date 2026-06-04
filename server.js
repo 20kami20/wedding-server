@@ -8,8 +8,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const BOT_TOKEN = "8662104987:AAE8FBN2bWoKuZ-Q-cYsXRnuf2f1wllHWeI";
-const CHAT_ID = "822403920";
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const CHAT_ID = process.env.CHAT_ID;
 
 app.post("/send-rsvp", async (req, res) => {
 

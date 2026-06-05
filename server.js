@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
-const fs = require("fs");
 
 const app = express();
 
@@ -17,32 +16,6 @@ app.post("/send-rsvp", async (req, res) => {
 
         const { name, attendance } = req.body;
 
-        const path = require("path");
-
-        const guestsFile = path.join(
-            __dirname,
-            "guests.json"
-        );
-
-        const guests = JSON.parse(
-            fs.readFileSync(guestsFile, "utf8")
-        );
-
-        const alreadyExists = guests.find(
-            guest =>
-                guest.name.toLowerCase() ===
-                name.toLowerCase()
-        );
-
-        if (alreadyExists) {
-
-            return res.status(400).json({
-                success: false,
-                message: "Этот гость уже отправил ответ"
-            });
-
-        }
-
         let answer = "";
 
         if (attendance === "alone") {
@@ -56,19 +29,6 @@ app.post("/send-rsvp", async (req, res) => {
         if (attendance === "no") {
             answer = "Нет, не смогу прийти";
         }
-
-        const newGuest = {
-            name,
-            attendance,
-            date: new Date().toISOString()
-        };
-
-        guests.push(newGuest);
-
-        fs.writeFileSync(
-            "guests.json",
-            JSON.stringify(guests, null, 4)
-        );
 
         const message =
             "💍 НОВОЕ ПОДТВЕРЖДЕНИЕ\n\n" +
@@ -89,7 +49,7 @@ app.post("/send-rsvp", async (req, res) => {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(error.response?.data || error);
 
         res.status(500).json({
             success: false
@@ -99,6 +59,6 @@ app.post("/send-rsvp", async (req, res) => {
 
 });
 
-app.listen(3000, () => {
+app.listen(process.env.PORT || 3000, () => {
     console.log("SERVER STARTED");
 });
